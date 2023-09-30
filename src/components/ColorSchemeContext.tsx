@@ -5,7 +5,7 @@ import { createContext, useContext, useState } from "react";
 import { Appearance } from "react-native";
 import { navThemeDark, navThemeLight } from "@/components/theme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { TamaguiProvider, Theme } from "tamagui";
+import { TamaguiProvider, Theme, ThemeName } from "tamagui";
 import tamaguiConfig from "tamagui.config";
 
 interface ColorSchemeProviderProps {
@@ -13,8 +13,8 @@ interface ColorSchemeProviderProps {
 }
 
 interface ColorSchemeContextType {
-  colorScheme: string;
-  setColorScheme: Dispatch<SetStateAction<string>>;
+  colorScheme: ThemeName;
+  setColorScheme: Dispatch<SetStateAction<ThemeName>>;
 }
 
 const ColorSchemeContext = createContext<ColorSchemeContextType | any>(
@@ -26,7 +26,7 @@ export const useColorScheme = () => {
 };
 
 export const ColorSchemeProvider = ({ children }: ColorSchemeProviderProps) => {
-  const [colorScheme, setColorScheme] = useState<string>(
+  const [colorScheme, setColorScheme] = useState<ThemeName>(
     Appearance.getColorScheme() ?? "light"
   );
 
@@ -37,21 +37,21 @@ export const ColorSchemeProvider = ({ children }: ColorSchemeProviderProps) => {
   };
 
   return (
-    <ThemeProvider
-      value={colorScheme === "dark" ? navThemeDark : navThemeLight}
+    <ColorSchemeContext.Provider
+      value={{ colorScheme, setColorScheme, toggleColorScheme }}
     >
       <TamaguiProvider config={tamaguiConfig}>
-        <Theme name="light">
-          <ColorSchemeContext.Provider
-            value={{ colorScheme, setColorScheme, toggleColorScheme }}
+        <Theme name={colorScheme}>
+          <ThemeProvider
+            value={colorScheme === "dark" ? navThemeDark : navThemeLight}
           >
             <GestureHandlerRootView style={{ flex: 1 }}>
               <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
               {children}
             </GestureHandlerRootView>
-          </ColorSchemeContext.Provider>
+          </ThemeProvider>
         </Theme>
       </TamaguiProvider>
-    </ThemeProvider>
+    </ColorSchemeContext.Provider>
   );
 };

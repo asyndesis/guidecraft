@@ -1,14 +1,19 @@
 import { useAuth } from "@/components/AuthProvider";
 import {
   DrawerContentScrollView,
+  DrawerItem,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { View } from "tamagui";
+import { Button, View } from "tamagui";
 import { Redirect } from "expo-router";
 import { Drawer } from "expo-router/drawer";
+import { Sun, Moon } from "@tamagui/lucide-icons";
+import { useColorScheme } from "@/components/ColorSchemeContext";
 
-export default function PublicLayout() {
-  const { user } = useAuth();
+export default function AppLayout() {
+  const { user, signOut } = useAuth();
+
+  const { toggleColorScheme, colorScheme } = useColorScheme();
 
   // // You can keep the splash screen open, or render a loading screen like we do here.
   // if (isLoading) {
@@ -33,7 +38,16 @@ export default function PublicLayout() {
           >
             <DrawerItemList {...props} />
             <View flex={1} />
-            <View padding="$3"></View>
+            <DrawerItem label="Log out" onPress={() => signOut()} />
+            <View padding="$3">
+              <Button
+                width={"$3"}
+                icon={colorScheme === "dark" ? Sun : Moon}
+                size="$3"
+                p="0"
+                onPress={() => toggleColorScheme()}
+              />
+            </View>
           </DrawerContentScrollView>
         );
       }}
@@ -44,12 +58,12 @@ export default function PublicLayout() {
           title: "Index",
         }}
       />
-      {/* <Drawer.Screen
+      <Drawer.Screen
         name="profile"
         options={{
           title: "Profile",
         }}
-      /> */}
+      />
     </Drawer>
   );
 }
